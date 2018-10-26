@@ -17,7 +17,7 @@ class Redprint:
 
     # 066 模仿蓝图定义register函数
     def register(self, bp, url_prefix=None):
-        # 067 避免冗余，可以在注册的时候不加url_prefix
+        # 067 避免冗余，可以在注册的时候不加url_prefix，下一步分析具体用户注册流程 --> ../api/v1/user.py
         if url_prefix is None:
             url_prefix = '/' + self.name
         for f, rule, options in self.mound:

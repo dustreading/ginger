@@ -15,9 +15,16 @@ api = Redprint('user')
 # 028 定义好了蓝图之后，我们就不需要flask核心对象了，可以直接用蓝图blueprint来注册视图函数
 # @app.route('/v1/user/get')
 
+
 # 029 使用蓝图user来注册视图函数 --> ./book.py
 # @user.route('/v1/user/get')
 # 049 改变用红图来注册视图函数，下一步我们需要创建一个蓝图，这是模块界别的蓝图，而红图是视图级别的 --> ./__init__.py
 @api.route('/get')
 def get_user():
     return "我是一只小松鼠~啦啦啦"
+
+
+# 068 绑定用户注册视图函数 <-- ../../libs/redprint.py
+@api.route('/create')
+def create_user():
+    pass
