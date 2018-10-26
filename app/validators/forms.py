@@ -1,14 +1,15 @@
 # 087 实现表单的验证 <-- ../api/v1/client.py
-from wtforms import StringField, IntegerField, Form
+from wtforms import StringField, IntegerField
 from wtforms.validators import DataRequired, length, Email, Regexp, ValidationError
 
 from app.libs.enums import ClientTypeEnum
 from app.models.user import User
+from app.validators.base import BaseForm as Form
 
 
 class ClientForm(Form):
     # 088 用户注册所需要的信息
-    account = StringField(validators=[DataRequired(), length(min=5, max=32)])  # 090 validators为验证器，用户名为必填字段
+    account = StringField(validators=[DataRequired(message='不允许为空'), length(min=5, max=32)])  # 090 validators为验证器，用户名为必填字段
     secret = StringField()
     # 089 获取客户端的类型
     type = IntegerField(validators=[DataRequired()])

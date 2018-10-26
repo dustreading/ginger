@@ -2,10 +2,15 @@
 # 002 不推荐在入口文件中实例化flask对象 --> ./app/app.py
 
 # 010 导入flask核心对象的生成函数
+from werkzeug.exceptions import HTTPException
+
 from app.app import create_app
 
 
 # 011 创建flask核心对象
+from app.libs.error import APIException
+from app.libs.error_code import ServerError
+
 app = create_app()
 # 014 调用app.run()开启服务器之前，先判断当前文件是否是入口文件
 
@@ -23,6 +28,22 @@ app = create_app()
 # def get_book():
 #     return 'get book'
 # # 020 发现问题：全部视图函数放在一个文件内，不利于管理，可以依据业务模块划分，将不同的视图函数放到不同的文件当中去
+
+
+@app.errorhandler(Exception)
+def framework_error(e):
+    if isinstance(e, APIException):
+        return e
+    if isinstance(e, HTTPException):
+        code = e.code
+        msg = e.description
+        error_code = 1007
+        return APIException(msg, code, error_code)
+    else:
+        if not app.config['DEBUG']:
+            return ServerError()
+        else:
+            raise e
 
 
 if __name__ == '__main__':
