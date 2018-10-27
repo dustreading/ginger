@@ -4,7 +4,7 @@
 # 010 导入flask核心对象的生成函数
 from werkzeug.exceptions import HTTPException
 
-from app.app import create_app
+from app import create_app
 
 
 # 011 创建flask核心对象

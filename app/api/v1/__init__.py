@@ -4,7 +4,7 @@ from flask import Blueprint
 
 
 # 051 创建一个蓝图构造函数
-from app.api.v1 import client
+from app.api.v1 import client, token
 
 
 def create_blueprint_v1():
@@ -16,5 +16,6 @@ def create_blueprint_v1():
     user.api.register(bp_v1)  # 061 加上url_prefix前缀，同时剔除book和user中相应的路由前缀 <-- ../../app.py
     book.api.register(bp_v1)  # 062 假象很完美，下一步我们将要实现红图函数 --> ../../libs/redprint.py
     client.api.register(bp_v1) # 097 将client注册打动蓝图中 --> ./client.py
+    token.api.register(bp_v1)
     # 058 返回蓝图，这时，此时已有红图注册到了蓝图当中，下一步需要将蓝图注册到flask核心对象上去 --> ../../app.py
     return bp_v1

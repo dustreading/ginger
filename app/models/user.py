@@ -1,7 +1,10 @@
 # 105 用户模型文件 <-- ../api/v1/client.py
-from sqlalchemy import Integer, Column, String, SmallInteger
-from werkzeug.security import generate_password_hash
+import datetime
 
+from sqlalchemy import Integer, Column, String, SmallInteger
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from app.libs.error_code import NotFound, AuthFailed
 from app.models.base import Base, db
 
 
@@ -10,7 +13,11 @@ class User(Base):
     email = Column(String(24), unique=True, nullable=False)
     nickname = Column(String(24), unique=True)
     auth = Column(SmallInteger, default=1)
+    # time = datetime.date(2018, 5, 20)
     _password = Column('password', String(100))
+
+    def keys(self):
+        return ['id', 'email', 'nickname', 'auth']
 
     @property
     def password(self):
@@ -28,3 +35,15 @@ class User(Base):
             user.email = account
             user.password = secret
             db.session.add(user)
+
+    @staticmethod
+    def verify(email, password):
+        user = User.query.filter_by(email=email).first_or_404()
+        if not user.check_password(password):
+            raise AuthFailed()
+        return {'uid': user.id}
+
+    def check_password(self, raw):
+        if not self._password:
+            return False
+        return check_password_hash(self._password, raw)
