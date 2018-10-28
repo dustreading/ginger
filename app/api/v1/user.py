@@ -4,9 +4,9 @@
 # from flask import Blueprint  # 054 删除之，因为我们已经有了红图来管理视图 --> ./book.py
 
 # 026 实例化一个蓝图blueprint
-from flask import jsonify
+from flask import jsonify, g
 
-from app.libs.error_code import NotFound
+from app.libs.error_code import NotFound, DeleteSuccess, AuthFailed
 from app.libs.redprint import Redprint
 from app.libs.token_auth import auth
 
@@ -14,6 +14,7 @@ from app.libs.token_auth import auth
 # user = Blueprint('user', __name__)  # 027 第一个参数为此蓝图blueprint的名称，第二个参数为必要的位置信息
 
 # 048 实例化一个redprint，给一个名字为user <-- ./book.py
+from app.models.base import db
 from app.models.user import User
 
 api = Redprint('user')
@@ -27,12 +28,30 @@ api = Redprint('user')
 # 049 改变用红图来注册视图函数，下一步我们需要创建一个蓝图，这是模块界别的蓝图，而红图是视图级别的 --> ./__init__.py
 @api.route('/<int:uid>', methods=['GET'])
 @auth.login_required
-def get_user(uid):
-    user = User.query.get_or_404(uid)
+def super_get_user(uid):
+    user = User.query.filter_by(id=uid).first_or_404()
     return jsonify(user)
 
 
-# 068 绑定用户注册视图函数 <-- ../../libs/redprint.py
-@api.route('/create')
-def create_user():
+@api.route('', methods=['GET'])
+@auth.login_required
+def get_user():
+    uid = g.user.id
+    user = User.query.filter_by(id=uid).first_or_404()
+    return jsonify(user)
+
+
+#管理员
+@api.route('/<int:uid>', methods=['DELETE'])
+def super_delete_user(uid):
     pass
+
+
+@api.route('', methods=['DELETE'])
+@auth.login_required
+def delete_user():
+    uid = g.user.uid
+    with db.auto_commit():
+        user = User.query.filter_by(id=uid).first_or_404()
+        user.delete()
+    return DeleteSuccess()
